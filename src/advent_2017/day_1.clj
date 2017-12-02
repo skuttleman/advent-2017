@@ -6,7 +6,7 @@
     (let [digits (->> (u/read-file 1 #"")
                      (map s/trim)
                      (remove empty?)
-                     (map #(Integer/parseInt %)))
+                     (map u/parse-int))
           digits' (digits-fn digits)]
         (->> [digits digits']
             (apply map vector)

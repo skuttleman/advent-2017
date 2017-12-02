@@ -11,4 +11,4 @@
                                         (Integer/parseInt)
                                         (dec))) [day step])
           step (get-in steps [day' step'])]
-        (println (step))))
+        (when step (println (step)))))

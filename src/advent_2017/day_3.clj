@@ -26,6 +26,13 @@
               :down  :right
               :right :up})))
 
+(defn ^:private turn-if [grid pt direction]
+    (let [direction' (turn direction)
+          {:keys [x y]} (move pt direction')]
+        (if (get grid [x y])
+            direction
+            direction')))
+
 (defn ^:private what-next? [num]
     (let [sqrt-able  (prev-perfect-sq num)
           sqrt       (int (Math/sqrt sqrt-able))
@@ -47,6 +54,21 @@
                     :direction direction'}
                 (dec target)))))
 
+(defn ^:private add-surrounding [grid {:keys [x y]}]
+    (->> [[(inc x) y] [(inc x) (inc y)] [x (inc y)] [(inc x) (dec y)]
+          [(dec x) y] [(dec x) (dec y)] [x (dec y)] [(dec x) (inc y)]]
+        (map (partial get grid))
+        (remove nil?)
+        (reduce + 0)))
+
+(defn ^:private encircle-and-build-until [grid direction {:keys [x y] :as pt} threshold]
+    (let [next-value (add-surrounding grid pt)
+          direction' (turn-if grid pt direction)
+          grid'      (assoc grid [x y] next-value)]
+        (if (> next-value threshold)
+            next-value
+            (recur grid' direction' (move pt direction') threshold))))
+
 ;; 475
 (defn step-1 []
     (let [target 277678
@@ -55,3 +77,7 @@
             (reduce-next initial)
             (:position)
             (taxicab-dist {:x 0 :y 0}))))
+
+;; 279138
+(defn step-2 []
+    (encircle-and-build-until {[0 0] 1} :right {:x 1 :y 0} 277678))

@@ -24,8 +24,15 @@
     (let [next     (redistribute banks)
           counter' (inc counter)]
         (if (contains? history next)
-            counter'
+            [counter' next]
             (recur next (conj history next) counter'))))
+
+(defn run-and-track-cycle-size [banks]
+    (let [[counter banks'] (run-and-track banks #{banks} 0)
+          [counter'] (run-and-track banks #{banks'} 0)]
+        (if (= banks banks')
+            counter
+            (- counter counter'))))
 
 (defn ^:private prep []
     (->> (u/read-file 6 #"\s")
@@ -34,8 +41,9 @@
 ;; 11137
 (defn step-1 []
     (let [initial (prep)]
-        (run-and-track initial #{initial} 0)))
+        (first (run-and-track initial #{initial} 0))))
 
 
 (defn step-2 []
-    )
+    (let [initial (prep)]
+        (run-and-track-cycle-size initial)))

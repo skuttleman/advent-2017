@@ -27,10 +27,17 @@
                 [4 4 4 4 4] [5 5 5 5 0]
                 [0 5 0 5 9] [2 7 2 7 1]))))
 
-(t/deftest run-and-track
+(t/deftest run-and-track-test
     (t/testing "counting redistributions"
-        (t/are [banks counter] (= (day-6/run-and-track banks #{banks} 0) counter)
+        (t/are [banks counter] (= (first (day-6/run-and-track banks #{banks} 0)) counter)
             [1 1 1] 4
             [1 2 1] 3
             [0 2 7 0] 5
             [5 9 8 4] 7)))
+
+(t/deftest run-and-track-cycle-size-test
+    (t/testing "determining loop size"
+        (t/are [banks cycle-size] (= (day-6/run-and-track-cycle-size banks) cycle-size)
+            [0 2 7 0] 4
+            [1 1 1] 3
+            [1 2 1] 3)))

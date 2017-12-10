@@ -25,6 +25,14 @@
         (take 2)
         (reduce * 1)))
 
-
+;; 2b0c9cc0449507a0db3babd57ad9e8d8
 (defn step-2 []
-    )
+    (->> (u/read-file 10 #"")
+        (map u/s->ascii)
+        (#(concat % [17 31 73 47 23]))
+        (repeat 64)
+        (flatten)
+        (knot-it-up (range 256) 0 0)
+        (partition 16)
+        (map (comp #(u/left-pad % "0" 2) #(Integer/toString % 16) (partial apply bit-xor)))
+        (apply str)))

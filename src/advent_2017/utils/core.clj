@@ -14,3 +14,17 @@
         (split-n-trim re)
         (map s/trim)
         (remove empty?)))
+
+(defn s->ascii [s]
+    (int (.charAt (str s) 0)))
+
+(defn pad [s padder min-len]
+    (if (>= (count s) min-len)
+        s
+        (recur (padder s) padder min-len)))
+
+(defn left-pad [s pad-char min-len]
+    (pad s #(str pad-char %) min-len))
+
+(defn right-pad [s pad-char min-len]
+    (pad s #(str % pad-char) min-len))

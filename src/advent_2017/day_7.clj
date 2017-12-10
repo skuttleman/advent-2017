@@ -19,12 +19,49 @@
         (apply set/difference)
         (first)))
 
+(defn ^:private find-tower [towers name]
+    (->> towers
+        (filter (comp (partial = name) first))
+        (first)))
+
+(defn ^:private get-weight [towers name]
+    (let [[_ weight children] (find-tower towers name)]
+        (apply + weight (map (partial get-weight towers) children))))
+
+(defn ^:private balanced? [towers name]
+    (let [[_ weight children] (find-tower towers name)]
+        (if (seq children)
+            (apply = (map (partial get-weight towers) children))
+            true)))
+
+(defn ^:private find-unbalanced [towers name]
+    (let [[_ weight children] (find-tower towers name)
+          i'm-balanced? (balanced? towers name)
+          unbalanced-child (->> children
+                               (map (juxt identity (partial balanced? towers)))
+                               (remove second)
+                               (ffirst))]
+        (if (or i'm-balanced? (and (not i'm-balanced?) unbalanced-child))
+            (recur towers unbalanced-child)
+            (->> children
+                (map (partial find-tower towers))
+                (map #(assoc % 2 (get-weight towers (first %))))))))
+
+(defn ^:private calculate-weight-diff [unbalanced-children]
+    (let [[[w tw] [_ tw']] (->> unbalanced-children
+                                (map rest)
+                                (sort-by (comp (partial * -1) second)))]
+        (- w (- tw tw'))))
+
 ;; aapssr
 (defn step-1 []
     (->> (prep)
         (get-base)))
 
-
+;; 1458
 (defn step-2 []
-    (let [towers (prep)
-          base (get-base towers)]))
+    (let [towers (prep)]
+        (->> towers
+            (get-base)
+            (find-unbalanced towers)
+            (calculate-weight-diff))))

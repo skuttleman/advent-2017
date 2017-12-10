@@ -23,24 +23,28 @@
         (map s->instruction)))
 
 (def ^:private find-largest-val
-    (comp (partial apply max) vals))
+    (comp (partial apply max 0) vals))
 
-(defn ^:private run-instructions [registers [[reg f amt targ op val] & instructions]]
+(defn ^:private run-instructions [registers largest [[reg f amt targ op val] & instructions]]
     (let [[op' f'] (map (partial get fns) [op f])
           [reg' targ'] (map (partial get registers) [reg targ])
           registers' (if (op' targ' val)
                          (update registers reg f' amt)
-                         registers)]
+                         registers)
+          largest' (max largest (find-largest-val registers))]
         (if (empty? instructions)
-            registers'
-            (recur registers' instructions))))
+            [registers' largest']
+            (recur registers' largest' instructions))))
 
 ;;4647
 (defn step-1 []
     (->> (prep)
-        (run-instructions {})
+        (run-instructions {} 0)
+        (first)
         (find-largest-val)))
 
 
 (defn step-2 []
-    )
+    (->> (prep)
+        (run-instructions {} 0)
+        (second)))

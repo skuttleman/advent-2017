@@ -11,11 +11,19 @@
         :se {:x (+ x 0.5) :y (+ y 0.5)}
         {:x x :y x}))
 
-(defn calculate-position [pos [move & moves]]
-    (let [pos' (move-to pos move)]
+(defn calculate-distance [pos]
+    (->> pos
+        (vals)
+        (map #(Math/abs %))
+        (reduce + 0)
+        (int)))
+
+(defn calculate-position [pos max-dist [move & moves]]
+    (let [pos' (move-to pos move)
+          max-dist' (max max-dist (calculate-distance pos'))]
         (if (empty? moves)
-            pos'
-            (recur pos' moves))))
+            [pos' max-dist']
+            (recur pos' max-dist' moves))))
 
 (defn prep []
     (->> (u/read-file 11 #",")
@@ -24,12 +32,12 @@
 ;; 796
 (defn step-1 []
     (->> (prep)
-        (calculate-position {:x 0 :y 0})
-        (vals)
-        (map #(Math/abs %))
-        (reduce + 0)
-        (int)))
+        (calculate-position {:x 0 :y 0} 0)
+        (first)
+        (calculate-distance)))
 
-
+;; 1585
 (defn step-2 []
-    )
+    (->> (prep)
+        (calculate-position {:x 0 :y 0} 0)
+        (second)))

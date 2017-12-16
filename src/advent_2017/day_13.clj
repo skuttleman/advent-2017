@@ -11,17 +11,24 @@
         (apply max)))
 
 (defn ^:private oscilate [size]
-    (let [values (cycle (concat (range size) (reverse (map inc (range (- size 2))))))]
-        (fn [step] (first (drop step values)))))
+    (let [diff (- size 2)
+          positions (+ size diff)]
+        (fn [step]
+            (->> positions
+                (mod (+ diff step))
+                (- positions)
+                (- size)
+                (Math/abs)))))
+
+(def ^:private scannerless (constantly -1))
 
 (defn ^:private build-board [scanners]
     (->> (board-size scanners)
         (inc)
         (range)
-        (map (fn [depth]
-                 (if-let [range (get scanners depth)]
-                     [depth (oscilate range)]
-                     [depth (constantly -1)])))))
+        (map (juxt identity #(if-let [size (get scanners %)]
+                                 (oscilate size)
+                                 scannerless)))))
 
 (defn ^:private step-through [scanners axis [step severity] [depth f]]
     (if (= axis (f step))
@@ -30,18 +37,31 @@
 
 (defn ^:private prep []
     (->> (u/read-file 13 #"\n")
-        #_(u/split-n-trim #"\n" "0: 3\n1: 2\n4: 4\n6: 4")
         (map parse-scanner)
         (into {})))
+
+(defn ^:private get-severity [scanners axis start board]
+    (->> board
+        (reduce (partial step-through scanners axis) [start 0])
+        (second)))
+
+(defn ^:private severe? [axis start board]
+    (->> board
+        (map-indexed (fn [step [_ f]] (= axis (f (+ start step)))))
+        (filter true?)
+        (seq)))
 
 ;; 1640
 (defn step-1 []
     (let [scanners (prep)]
         (->> scanners
             (build-board)
-            (reduce (partial step-through scanners 0) [0 0])
-            (second))))
+            (get-severity scanners 0 0))))
 
-
+;; 3960702
 (defn step-2 []
-    )
+    (let [board (build-board (prep))]
+        (loop [start 0 severe (severe? 0 0 board)]
+            (if severe
+                (recur (inc start) (severe? 0 (inc start) board))
+                start))))

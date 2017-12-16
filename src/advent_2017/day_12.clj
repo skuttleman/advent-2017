@@ -16,7 +16,8 @@
         (->> conns
             (remove memoized)
             (filter #(is-connected-to? (conj memoized %) pipes pipe [% (get pipes %)]))
-            (seq))))
+            (seq)
+            (boolean))))
 
 (defn prep []
     (->> (u/read-file 12 #"\n")
@@ -30,6 +31,13 @@
             (filter (partial is-connected-to? #{} pipes 0))
             (count))))
 
-
+;; 179
 (defn step-2 []
-    )
+    (let [pipes (prep)
+          grouper (partial is-connected-to? #{} pipes)]
+        (loop [id 1 groups 1 grouped (group-by (partial grouper 0) pipes)]
+            (if-let [grouped' (get grouped false)]
+                (recur (inc id)
+                    (if (get grouped true) (inc groups) groups)
+                    (group-by (partial grouper id) grouped'))
+                groups))))

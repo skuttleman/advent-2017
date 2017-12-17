@@ -31,3 +31,12 @@
 
 (defn right-pad [s pad-char min-len]
     (pad s #(str % pad-char) min-len))
+
+(defn sub-str
+    ([s start] (sub-str s start (count s)))
+    ([s start end]
+        (let [start' (max 0 start)
+              end' (min (count s) end)]
+            (if (>= start' end')
+                ""
+                (subs s start' end')))))

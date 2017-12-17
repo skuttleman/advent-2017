@@ -4,6 +4,9 @@
 (defn parse-int [value]
     (Integer/parseInt (str value)))
 
+(def divisible-by?
+    (comp zero? mod))
+
 (defn split-n-trim [re input]
     (->> (s/split input re)
         (map s/trim)

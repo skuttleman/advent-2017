@@ -18,18 +18,23 @@
         (u/left-pad "0" 16)
         (truncate 16)))
 
+(defn ^:private find-matches [seq-a seq-b sample-size]
+    (loop [[a & more-a] seq-a [b & more-b] seq-b remaining sample-size matches 0]
+        (if (pos? remaining)
+            (let [matches' (if (= (num->lower-16-bin a) (num->lower-16-bin b))
+                               (inc matches)
+                               matches)]
+                (recur more-a more-b (dec remaining) matches'))
+            matches)))
+
 ;; 631
 (defn step-1 []
     (let [generator-a (generator 873 16807 2147483647)
           generator-b (generator 583 48271 2147483647)]
-        (loop [[a & more-a] generator-a [b & more-b] generator-b sample 40000000 matches 0]
-            (if (pos? sample)
-                (let [matches' (if (= (num->lower-16-bin a) (num->lower-16-bin b))
-                                   (inc matches)
-                                   matches)]
-                    (recur more-a more-b (dec sample) matches'))
-                matches))))
+        (find-matches generator-a generator-b 40000000)))
 
-
+;; 279
 (defn step-2 []
-    )
+    (let [generator-a (filter #(u/divisible-by? % 4) (generator 873 16807 2147483647))
+          generator-b (filter #(u/divisible-by? % 8) (generator 583 48271 2147483647))]
+        (find-matches generator-a generator-b 5000000)))

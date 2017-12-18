@@ -15,6 +15,7 @@
               [advent-2017.day-14 :as day-14]
               [advent-2017.day-15 :as day-15]
               [advent-2017.day-16 :as day-16]
+              [advent-2017.day-17 :as day-17]
               [clojure.string :as s]))
 
 (def steps
@@ -33,7 +34,8 @@
      [day-13/step-1 day-13/step-2]
      [day-14/step-1 day-14/step-2]
      [day-15/step-1 day-15/step-2]
-     [day-16/step-1 day-16/step-2]])
+     [day-16/step-1 day-16/step-2]
+     [day-17/step-1 day-17/step-2]])
 
 (defn -main [& [day step]]
     (let [[day' step'] (map (fn [v] (-> (str "0" v)

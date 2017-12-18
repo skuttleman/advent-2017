@@ -26,24 +26,30 @@
         (exchange s idx-1 idx-2)))
 
 (defn ^:private s->fn [s]
-    (let [[_spin sp] (re-matches #"s(\d+)" s)
-          [_exchange x-a x-b] (re-matches #"x(\d+)/(\d+)" s)
-          [_partner p-a p-b] (re-matches #"p([a-z]+)/([a-z]+)" s)]
+    (let [[_s sp] (re-matches #"s(\d+)" s)
+          [_e x-a x-b] (re-matches #"x(\d+)/(\d+)" s)
+          [_p p-a p-b] (re-matches #"p([a-z]+)/([a-z]+)" s)]
         (cond
-            _spin [spin [(u/parse-int sp)]]
-            _exchange [exchange [(u/parse-int x-a) (u/parse-int x-b)]]
-            _partner [partner [p-a p-b]])))
+            _s #(spin % (u/parse-int sp))
+            _e #(exchange % (u/parse-int x-a) (u/parse-int x-b))
+            _p #(partner % p-a p-b))))
 
-(defn ^:private prep []
+(defn ^:private ->dance []
     (->> (u/read-file 16 #",")
-        (map s->fn)))
+        (map s->fn)
+        (reverse)
+        (apply comp)
+        (memoize)))
 
 ;; ehdpincaogkblmfj
 (defn step-1 []
-    (let [dancers (apply str (take 16 letters))]
-        (->> (prep)
-            (reduce (fn [s [f args]] (apply f s args)) dancers))))
+    (let [dance (->dance)]
+        (dance (apply str (take 16 letters)))))
 
-
+;; bpcekomfgjdlinha
 (defn step-2 []
-    )
+    (let [dance (->dance)]
+        (loop [dancers (apply str (take 16 letters)) remaining 1000000000]
+            (if (pos? remaining)
+                (recur (dance dancers) (dec remaining))
+                dancers))))

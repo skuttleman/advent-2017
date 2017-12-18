@@ -40,3 +40,13 @@
             (if (>= start' end')
                 ""
                 (subs s start' end')))))
+
+(defn matches [re s & rules]
+    (->> (re-matches re s)
+        (rest)
+        (map #(loop [[re' f & more] rules]
+                 (cond
+                     (and re' f (re-matches re' %)) (f %)
+                     (empty? more) %
+                     :else (recur more))))
+        (seq)))

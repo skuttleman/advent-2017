@@ -1,5 +1,6 @@
 (ns advent-2017.utils.core
-    (:require [clojure.string :as s]))
+    (:require [clojure.string :as s]
+              [clojure.core.async.impl.protocols :refer [Channel]]))
 
 (defn parse-int [value]
     (Integer/parseInt (str value)))
@@ -50,3 +51,5 @@
                      (empty? more) %
                      :else (recur more))))
         (seq)))
+
+(def chan? (partial satisfies? Channel))

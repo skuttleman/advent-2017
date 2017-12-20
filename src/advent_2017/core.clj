@@ -17,7 +17,9 @@
               [advent-2017.day-16 :as day-16]
               [advent-2017.day-17 :as day-17]
               [advent-2017.day-18 :as day-18]
-              [clojure.string :as s]))
+              [clojure.string :as s]
+              [advent-2017.utils.core :as u]
+              [clojure.core.async :as async]))
 
 (def steps
     [[day-1/step-1 day-1/step-2]
@@ -45,4 +47,8 @@
                                         (Integer/parseInt)
                                         (dec))) [day step])
           step (get-in steps [day' step'])]
-        (when step (println (step)))))
+        (when step
+            (let [result (step)]
+                (if (u/chan? result)
+                    (println (async/<!! result))
+                    (println result))))))

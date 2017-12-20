@@ -40,7 +40,7 @@
     (let [cell (get-in grid position)]
         (cond
             (= "+" cell) (turn grid position direction)
-            (empty? (s/trim cell)) nil
+            (empty? (s/trim (str cell))) nil
             :else direction)))
 
 (defn ^:private update-letters [grid position letters]
@@ -53,15 +53,20 @@
     (->> (s/split (slurp "resources/day19.txt") #"\n")
         (mapv (comp vec #(s/split % #"")))))
 
+(defn ^:private trace []
+    (let [grid (prep)]
+        (loop [position (find-start grid) direction [1 0] letters "" moves 0]
+            (if-let [move (get-move grid position direction)]
+                (recur (combine-positions position move) move (update-letters grid position letters) (inc moves))
+                [letters moves]))))
+
 ;; SXWAIBUZY
 (defn step-1 []
-    (let [grid (prep)]
-        (loop [position (find-start grid) direction [1 0] letters ""]
-            (if-let [move (get-move grid position direction)]
-                (recur (combine-positions position move) move (update-letters grid position letters))
-                letters))))
+    (->> (trace)
+        (first)))
 
 
 (defn step-2 []
-    )
+    (->> (trace)
+        (second)))
 

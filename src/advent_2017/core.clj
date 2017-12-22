@@ -18,6 +18,7 @@
               [advent-2017.day-17 :as day-17]
               [advent-2017.day-18 :as day-18]
               [advent-2017.day-19 :as day-19]
+              [advent-2017.day-20 :as day-20]
               [clojure.string :as s]
               [advent-2017.utils.core :as u]
               [clojure.core.async :as async]))
@@ -41,13 +42,14 @@
      [day-16/step-1 day-16/step-2]
      [day-17/step-1 day-17/step-2]
      [day-18/step-1 day-18/step-2]
-     [day-19/step-1 day-19/step-2]])
+     [day-19/step-1 day-19/step-2]
+     [day-20/step-1 day-20/step-2]])
 
 (defn -main [& [day step]]
-    (let [[day' step'] (map (fn [v] (-> (str "0" v)
-                                        (s/replace #"\D" "")
-                                        (Integer/parseInt)
-                                        (dec))) [day step])
+    (let [[day' step'] (map #(-> (str "0" %)
+                                 (s/replace #"\D" "")
+                                 (Integer/parseInt)
+                                 (dec)) [day step])
           step (get-in steps [day' step'])]
         (when step
             (let [result (step)]

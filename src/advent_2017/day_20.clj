@@ -69,6 +69,12 @@
         (recur (dec n) (mapv (fn [[i p]] [i (move p)]) particles))
         particles))
 
+(defn ^:private resolve-collisions [particles]
+    (->> particles
+        (group-by :position)
+        (remove (fn [[k v]] (> (count v) 1)))
+        (mapcat val)))
+
 ;; 258
 (defn step-1 []
     (loop [particles (move-times 4500 (prep))]
@@ -77,6 +83,9 @@
                 (recur (trim-down particles))
                 (first particles)))))
 
-
+;; 707
 (defn step-2 []
-    )
+    (loop [particles (map second (prep)) counter 5000]
+        (if (pos? counter)
+            (recur (resolve-collisions (map move particles)) (dec counter))
+            (count particles))))

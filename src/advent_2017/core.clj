@@ -21,6 +21,7 @@
               [advent-2017.day-20 :as day-20]
               [advent-2017.day-21 :as day-21]
               [advent-2017.day-22 :as day-22]
+              [advent-2017.day-23 :as day-23]
               [clojure.string :as s]
               [advent-2017.utils.core :as u]
               [clojure.core.async :as async]))
@@ -47,7 +48,8 @@
      [day-19/step-1 day-19/step-2]
      [day-20/step-1 day-20/step-2]
      [day-21/step-1 day-21/step-2]
-     [day-22/step-1 day-22/step-2]])
+     [day-22/step-1 day-22/step-2]
+     [day-23/step-1 day-23/step-2]])
 
 (defn -main [& [day step]]
     (let [[day' step'] (map #(-> (str "0" %)

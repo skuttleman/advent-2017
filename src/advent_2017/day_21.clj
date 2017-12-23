@@ -3,15 +3,13 @@
     (:require [advent-2017.utils.core :as u]
               [advent-2017.utils.matrix :as m]))
 
-(defn spy [s] (println s) s)
-
 (def ^:private pattern ".#./..#/###")
 
 (def ^:private flatten-matrix
-    (partial m/flatten "/" ""))
+    (memoize (partial m/flatten "/" "")))
 
 (def ^:private expand-matrix
-    (partial m/expand #"/" #""))
+    (memoize (partial m/expand #"/" #"")))
 
 (defn ^:private s->rule [s]
     (let [[_ rule result] (re-matches #"(\S+) => (\S+)" s)]
@@ -38,8 +36,8 @@
         (reduce (partial find-match rules) nil)
         (expand-matrix)))
 
-(defn ^:private split-and-expand [matrix rules]
-    (let [size (count matrix)
+(defn ^:private split-and-expand [rules matrix]
+    (let [size     (count matrix)
           matrices (cond
                        (<= size 3) [matrix]
                        (u/divisible-by? size 2) (m/split 2 matrix)
@@ -52,14 +50,17 @@
     (->> (u/read-file 21 #"\n")
         (map s->rule)))
 
+(defn ^:private process [iterations]
+    (let [rules (prep)]
+        (loop [matrix (expand-matrix pattern) iterations' 0]
+            (if (= iterations' iterations)
+                (->> matrix (flatten-matrix) (filter #{\#}) (count))
+                (recur (split-and-expand rules matrix) (inc iterations'))))))
+
 ;; 190
 (defn step-1 []
-    (let [rules (prep)]
-        (loop [matrix (expand-matrix pattern) iterations 0]
-            (if (= iterations 5)
-                (->> matrix (flatten-matrix) (filter #{\#}) (count))
-                (recur (split-and-expand matrix rules) (inc iterations))))))
+    (process 5))
 
-
+;; 2335049
 (defn step-2 []
-    )
+    (process 18))

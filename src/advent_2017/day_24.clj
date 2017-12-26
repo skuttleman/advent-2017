@@ -36,23 +36,23 @@
         (map s->port)
         (set)))
 
-(def ^:private remove-port disj)
-
-(defn ^:private build-strongest [next-f bridge ports]
+(defn ^:private build-strongest [sort-f next-f bridge ports]
     (let [next-ports (next-f bridge ports)]
         (if (empty? next-ports)
             bridge
             (->> next-ports
-                (map #(build-strongest connectables (connect bridge %) (remove-port ports %)))
-                (sort-by strength >)
+                (map #(build-strongest sort-f connectables (connect bridge %) (disj ports %)))
+                (sort-by sort-f #(compare %2 %1))
                 (first)))))
 
 ;; 1906
 (defn step-1 []
     (->> (prep)
-        (build-strongest start-ports nil)
+        (build-strongest strength start-ports nil)
         (strength)))
 
-
+;; 1824
 (defn step-2 []
-    )
+    (->> (prep)
+        (build-strongest (juxt count strength) start-ports nil)
+        (strength)))
